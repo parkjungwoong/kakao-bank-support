@@ -1,9 +1,15 @@
 package com.kakaopay.banksupport.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.ibatis.type.Alias;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
+@Builder
 @Alias("LocalBankSupport")
 public class LocalBankSupport {
     private String lbsId;
