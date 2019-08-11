@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kakaopay.banksupport.mapper.BankMapper">
+
+    <insert id="insertBankSupport" parameterType="LocalBankSupport">
+        INSERT INTO LOCAL_BANK_SUPPORT
+        (
+            LBS_ID,
+            REGION_ID,
+            TARGET,
+            USAGE,
+            SUPPORT_LIMIT,
+            RATE,
+            INSTITUTE,
+            MGMT,
+            RECEPTION
+        )
+        VALUES
+        (
+            TO_CHAR(SYSDATE,'YYYYMMDD')||SEQ_SUPPORT_ID.NEXTVAL,
+            #{regionId},
+            #{target},
+            #{usage},
+            #{supportLimit},
+            #{rate},
+            #{institute},
+            #{mgmt},
+            #{reception}
+        )
+    </insert>
+
+    <select id="selectBankSupport" parameterType="LocalBankSupport" resultType="LocalBankSupport">
+        SELECT *
+        FROM   LOCAL_BANK_SUPPORT
+    </select>
+
+    <insert id="insertRegion" parameterType="RegionMas">
+        INSERT INTO REGION_MAS
+        (
+            REGION_ID,
+            NAME,
+            MAP_ID
+        )
+        VALUES
+        (
+            #{regionId},
+            #{name},
+            #{mapId}
+        )
+    </insert>
+
+    <!-- todo: 쿼리 작성 -->
+    <insert id="insertUsageCode" parameterType="UsageCode">
+
+    </insert>
+
+    <!-- todo: 쿼리 작성 -->
+    <insert id="insertUsageOpt" parameterType="UsageOpt">
+
+    </insert>
+
+</mapper>
