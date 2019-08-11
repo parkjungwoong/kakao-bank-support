@@ -22,9 +22,15 @@ public interface BankMapper {
 
     void insertRegion(RegionMas build);
 
+    //=== 용도 관련 ===
+    @Select("SELECT TO_CHAR(SYSDATE,'YYYYMMDD')||SEQ_USAGE_CODE_ID.NEXTVAL FROM DUAL")
+    String getUsageCodeId();
+
     //용도 코드 저장
     void insertUsageCode(UsageCode usageCode);
 
     //용도 옵션 저장
     void insertUsageOpt(UsageOpt usageOpt);
+
+    void insertLocalBankSupportDtl(LocalBankSupportDtl localBankSupportDtl);
 }

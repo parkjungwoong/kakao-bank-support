@@ -52,14 +52,58 @@
         )
     </insert>
 
-    <!-- todo: 쿼리 작성 -->
+    <!-- 용도 코드 저장 -->
     <insert id="insertUsageCode" parameterType="UsageCode">
-
+        INSERT INTO USAGE_CODE
+        (
+            USAGE_CODE_ID,
+            VAL,
+            USE_YN
+        )
+        VALUES
+        (
+            #{usageCodeId},
+            #{val},
+            #{useYn}
+        )
     </insert>
 
-    <!-- todo: 쿼리 작성 -->
+    <!-- 용도 옵션 저장 -->
     <insert id="insertUsageOpt" parameterType="UsageOpt">
+        INSERT INTO USAGE_OPT
+        (
+            USAGE_CODE_ID,
+            LBS_ID,
+            USE_YN
+        )
+        VALUES
+        (
+            #{usageCodeId},
+            #{lbsId},
+            #{useYn}
+        )
+    </insert>
 
+    <!-- 지원 정보 상세 저장 -->
+    <insert id="insertLocalBankSupportDtl" parameterType="LocalBankSupportDtl">
+        INSERT INTO LOCAL_BANK_SUPPORT_DTL
+        (
+            LBS_DTL_ID,
+            LBS_ID,
+            SUPPORT_LIMIT,
+            RATE_MIN,
+            RATE_AVG,
+            RATE_MAX
+        )
+        VALUES
+        (
+            TO_CHAR(SYSDATE,'YYYYMMDD')||SEQ_SUPPORT_DTL_ID.NEXTVAL,
+            #{lbsId},
+            #{supportLimit},
+            #{rateMin},
+            #{rateAvg},
+            #{rateMax}
+        )
     </insert>
 
 </mapper>
