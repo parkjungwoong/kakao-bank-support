@@ -1,18 +1,17 @@
 package com.kakaopay.banksupport.model;
 
+import lombok.Builder;
 import lombok.Data;
 import org.apache.ibatis.type.Alias;
 
+@Builder
 @Data
 @Alias("LocalBankSupportDtl")
 public class LocalBankSupportDtl {
     private String lbsDtlId;
     private String lbsId;
-    private String usageOptId;
-    private String supportLimitMin;
-    private String supportLimitAvg;
-    private String supportLimitMax;
-    private String rateMin;
-    private String rateAvg;
-    private String rateMax;
+    private long supportLimit;
+    private float rateMin;
+    private float rateAvg;
+    private float rateMax;
 }
