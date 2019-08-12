@@ -11,6 +11,11 @@ import java.util.List;
 @Mapper
 public interface BankMapper {
 
+    //지원정보 아이디
+    @Select("SELECT TO_CHAR(SYSDATE,'YYYYMMDD')||SEQ_LBS_ID.NEXTVAL FROM DUAL")
+    String getSeqLbsId();
+
+    //기관 아이디
     @Select("SELECT TO_CHAR(SYSDATE,'YYYYMMDD')||SEQ_REGION_ID.NEXTVAL FROM DUAL")
     String getSeqRegionId();
 
