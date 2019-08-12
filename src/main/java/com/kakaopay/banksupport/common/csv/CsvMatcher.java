@@ -28,7 +28,7 @@ public abstract class CsvMatcher<T> {
      * @param columnNms csv파일의 첫번째 row
      * @return true면 변환 대상임
      */
-    abstract protected boolean isMatch(String[] columnNms);
+    abstract protected boolean isMatch(List<String> columnNms);
 
     /**
      * CsvDTO -> 변환할 데이터 타입
@@ -51,7 +51,7 @@ public abstract class CsvMatcher<T> {
         return result;
     }
 
-    private T getConvertData(String[] rowData) {
+    private T getConvertData(List<String> rowData) {
         //todo: 변수명 및 에러 처리 수정하기
         T t;
 
@@ -71,7 +71,7 @@ public abstract class CsvMatcher<T> {
         try {
             for(Field f : fields) {
                 f.setAccessible(true);
-                f.set(t,rowData[i]);
+                f.set(t,rowData.get(i));
                 i++;
             }
         } catch (Exception e) {

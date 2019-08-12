@@ -22,14 +22,16 @@ public class CommonUtils {
      * @throws ComException ErrorCode.E999
      */
     public static CsvDTO readCsvFile(final String filePath) throws ComException {
+        log.debug("file name : {}",filePath);
+
         String line;
-        List<String> rowList;
+        List<List<String>> rowList;
 
         try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "EUC-KR"))) {
             rowList = new ArrayList<>();
 
             while ((line = br.readLine()) != null) {
-                rowList.add(line);
+                rowList.add(parsingCsvRow(line));
             }
         } catch (IOException e) {
             log.error("readCsvFile ERR",e);
@@ -37,6 +39,38 @@ public class CommonUtils {
         }
 
         return CsvDTO.CreateCsvDTO(rowList);
+    }
+
+    public static List<String> parsingCsvRow(final String row) {
+        String[] strings = row.split(",");
+
+        boolean dobuleQ = false;
+
+        StringBuffer sb = null;
+        List<String> parsRow = new ArrayList<>();
+
+        for(String e : strings) {
+            if(e.startsWith("\"")) {
+                dobuleQ = true;
+                sb = new StringBuffer();
+                sb.append(e,1,e.length());
+                continue;
+            }
+
+            if(dobuleQ) {
+                if(e.endsWith("\"")) {
+                    sb.append(e,0,e.length()-1);
+                    parsRow.add(sb.toString());
+                    dobuleQ = false;
+                } else {
+                    sb.append(e);
+                }
+            } else {
+                parsRow.add(e);
+            }
+        }
+
+        return parsRow;
     }
 
     /**
