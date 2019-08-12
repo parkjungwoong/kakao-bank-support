@@ -6,10 +6,7 @@ import com.kakaopay.banksupport.config.ComSettings;
 import com.kakaopay.banksupport.dto.CsvBankSupportDTO;
 import com.kakaopay.banksupport.dto.CsvDTO;
 import com.kakaopay.banksupport.mapper.BankMapper;
-import com.kakaopay.banksupport.model.LocalBankSupport;
-import com.kakaopay.banksupport.model.LocalBankSupportDtl;
-import com.kakaopay.banksupport.model.RegionMas;
-import com.kakaopay.banksupport.model.UsageCode;
+import com.kakaopay.banksupport.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.ExecutorType;
@@ -32,8 +29,6 @@ public class BankService {
 
     @Transactional
     public void setUpInitData() {
-        log.info("초기 데이터 로드 시작 ");
-
         //csv file read
         CsvDTO csvDTO = CommonUtils.readCsvFile(comSettings.getInitDataFilePath());
 
@@ -52,19 +47,22 @@ public class BankService {
             if(StringUtils.isEmpty(regionId)) {
                 regionId = bankMapper.getSeqRegionId();
                 regionMap.put(readData.getRegionNm(), regionId);
+
+                //기관 정보 저장
+                bankMapper.insertRegion(
+                        RegionMas.builder()
+                                .regionId(regionId)
+                                .name(readData.getRegionNm())
+                                .build()
+                );
             }
 
-            //기관 정보 저장
-            bankMapper.insertRegion(
-                    RegionMas.builder()
-                            .regionId(regionId)
-                            .name(readData.getRegionNm())
-                    .build()
-            );
+            final String lbsId = bankMapper.getSeqLbsId();
 
             //지원 정보 저장
             sqlSession.insert("insertBankSupport",
                     LocalBankSupport.builder()
+                            .lbsId(lbsId)
                             .regionId(regionId)
                             .target(readData.getTarget())
                             .usage(readData.getUsage())
@@ -85,15 +83,24 @@ public class BankService {
                 if(StringUtils.isEmpty(usageCodeId)) {
                     usageCodeId = bankMapper.getUsageCodeId();
                     usageCodeMap.put(usa.trim(), usageCodeId);
+
+                    //용도 코드 저장
+                    bankMapper.insertUsageCode(
+                            UsageCode.builder()
+                                    .usageCodeId(usageCodeId)
+                                    .val(usa.trim())
+                                    .useYn("Y")
+                                    .build()
+                    );
                 }
 
-                //용도 코드 저장
-                bankMapper.insertUsageCode(
-                        UsageCode.builder()
+                //todo: 용도 옵션 저장
+                bankMapper.insertUsageOpt(
+                        UsageOpt.builder()
                                 .usageCodeId(usageCodeId)
-                                .val(usa.trim())
+                                .lbsId(lbsId)
                                 .useYn("Y")
-                        .build()
+                                .build()
                 );
             }
 
@@ -110,28 +117,35 @@ public class BankService {
             float min=0;
             float max=0;
 
-            String[] rates = readData.getRate().split("~");
-            //소수점 두자리 까지
-            for(int i=0; rates.length>i; i++) {
-                float a = CommonUtils.strPercentToFloat(rates[i]);
-                if(i == 0) min = a;
-                if(i == 1) max = a;
+            if(!"대출이자 전액".equals(readData.getRate())) {
+                String[] rates = readData.getRate().split("~");
+                //소수점 두자리 까지
+                for(int i=0; rates.length>i; i++) {
+                    float a = CommonUtils.strPercentToFloat(rates[i]);
+                    if(i == 0) min = a;
+                    if(i == 1) max = a;
+                }
+                if(max == 0) max = min;
+            } else {
+                min=100;
+                max=100;
             }
 
             //todo: 지원 정보 상세 저장
             bankMapper.insertLocalBankSupportDtl(
                     LocalBankSupportDtl.builder()
-                            .lbsId(regionId)
+                            .lbsId(lbsId)
                             .supportLimit(supportLimit)
                             .rateMin(min)
                             .rateAvg((max+min)/2)
                             .rateMax(max)
                             .build()
             );
-
-            //todo: 용도 옵션 저장
-
         }
 
+        sqlSession.flushStatements();
+        sqlSession.close();
     }
+
+
 }
