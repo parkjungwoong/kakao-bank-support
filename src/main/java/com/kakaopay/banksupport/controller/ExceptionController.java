@@ -16,13 +16,13 @@ public class ExceptionController {
     @ExceptionHandler(ComException.class)
     public ComDTO sendComErrorMsg(ComException e) {
         //todo:
-        return new ComDTO(ErrorCode.E999);
+        return new ComDTO(e.getErrorCode());
     }
 
     @ExceptionHandler(Exception.class)
     public ComDTO sendErrorMsg(Exception e) {
         //todo:
-        return null;
+        return new ComDTO(ErrorCode.E999);
     }
 
 
