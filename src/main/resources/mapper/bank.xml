@@ -20,7 +20,7 @@
         )
         VALUES
         (
-            TO_CHAR(SYSDATE,'YYYYMMDD')||SEQ_SUPPORT_ID.NEXTVAL,
+            #{lbsId},
             #{regionId},
             #{target},
             #{usage},
@@ -97,7 +97,7 @@
         )
         VALUES
         (
-            TO_CHAR(SYSDATE,'YYYYMMDD')||SEQ_SUPPORT_DTL_ID.NEXTVAL,
+            TO_CHAR(SYSDATE,'YYYYMMDD')||SEQ_LBS_DTL_ID.NEXTVAL,
             #{lbsId},
             #{supportLimit},
             #{rateMin},
