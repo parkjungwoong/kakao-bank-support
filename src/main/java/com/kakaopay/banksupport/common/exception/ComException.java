@@ -9,12 +9,12 @@ public class ComException extends RuntimeException {
     private ErrorCode errorCode;
 
     public ComException(ErrorCode errorCode, Throwable e){
-        super(e);
+        super(errorCode.getMessage(), e);
         this.errorCode = errorCode;
     }
 
     public ComException(ErrorCode errorCode){
-        super(errorCode.toString());
+        super(errorCode.getMessage());
         this.errorCode = errorCode;
     }
 

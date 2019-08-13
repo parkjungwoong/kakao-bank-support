@@ -1,10 +1,12 @@
 package com.kakaopay.banksupport.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.ibatis.type.Alias;
 
+@Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
