@@ -34,13 +34,14 @@ public class LoginReqProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        log.info("LoginReqProvider");
         final String id = (String) authentication.getPrincipal();
         final String pw = (String) authentication.getCredentials();
 
         UserInfo userInfo = userService.selectUserInfo(SignInDTO.builder().id(id).pw(pw).build());
 
         if(userInfo == null) throw new ComAuthException(ErrorCode.E004);
-        if(passwordEncoder.matches(pw, userInfo.getUserPw()))  throw new ComAuthException(ErrorCode.E004);
+        if(!passwordEncoder.matches(pw, userInfo.getUserPw()))  throw new ComAuthException(ErrorCode.E004);
 
         //todo: 권한 설정하기
         List<GrantedAuthority> authorityList = new ArrayList<>();

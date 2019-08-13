@@ -1,15 +1,18 @@
 package com.kakaopay.banksupport.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kakaopay.banksupport.config.security.filter.JwtReqFilter;
 import com.kakaopay.banksupport.config.security.filter.LoginReqFilter;
 import com.kakaopay.banksupport.config.security.handler.AuthFailHandler;
 import com.kakaopay.banksupport.config.security.handler.AuthSuccessHandler;
+import com.kakaopay.banksupport.config.security.handler.LoginSuccessHandler;
+import com.kakaopay.banksupport.config.security.provider.JwtReqProvider;
+import com.kakaopay.banksupport.config.security.provider.LoginReqProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -17,7 +20,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 @Configuration
@@ -34,6 +36,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired private AuthSuccessHandler successHandler;
     @Autowired private AuthFailHandler failHandler;
     @Autowired private ObjectMapper objectMapper;
+//
+    @Autowired private LoginSuccessHandler loginSuccessHandler;
+    @Autowired private LoginReqProvider loginReqProvider;
+    @Autowired private JwtReqProvider jwtReqProvider;
+
+    private LoginReqFilter loginReqFilterBuilder(AuthenticationManager authenticationManager) {
+        LoginReqFilter loginReqFilter = new LoginReqFilter(loginSuccessHandler,failHandler,objectMapper);
+        loginReqFilter.setAuthenticationManager(authenticationManager);
+        return loginReqFilter;
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -55,17 +67,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(RESOURCE_URL_PREPIX)
                 .authenticated()
-
                 .and()
-                .addFilterBefore(new LoginReqFilter(successHandler, failHandler, objectMapper), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new JwtReqFilter(successHandler, failHandler, objectMapper), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(loginReqFilterBuilder(authenticationManager()), UsernamePasswordAuthenticationFilter.class)
+                //.addFilterBefore(new LoginReqFilter(successHandler, failHandler, objectMapper), UsernamePasswordAuthenticationFilter.class)
+                //.addFilterBefore(new JwtReqFilter(successHandler, failHandler, objectMapper), UsernamePasswordAuthenticationFilter.class)
                 ;
     }
 
-    @Bean
     @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    protected AuthenticationManager authenticationManager() throws Exception {
+        return new ProviderManager(Arrays.asList(loginReqProvider, jwtReqProvider));
     }
 
     @Bean

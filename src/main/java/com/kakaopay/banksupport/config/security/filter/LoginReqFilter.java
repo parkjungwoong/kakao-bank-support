@@ -3,18 +3,16 @@ package com.kakaopay.banksupport.config.security.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakaopay.banksupport.common.constant.ErrorCode;
 import com.kakaopay.banksupport.config.security.exception.ComAuthException;
-import com.kakaopay.banksupport.config.security.handler.AuthFailHandler;
-import com.kakaopay.banksupport.config.security.handler.AuthSuccessHandler;
 import com.kakaopay.banksupport.dto.SignInDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-import org.springframework.stereotype.Component;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -31,7 +29,7 @@ public class LoginReqFilter extends AbstractAuthenticationProcessingFilter {
 
     private ObjectMapper objectMapper;
 
-    public LoginReqFilter(AuthSuccessHandler successHandler, AuthFailHandler failHandler, ObjectMapper objectMapper) {
+    public LoginReqFilter(AuthenticationSuccessHandler successHandler, AuthenticationFailureHandler failHandler, ObjectMapper objectMapper) {
         super(SIGN_IN_URL);
         this.objectMapper = objectMapper;
         super.setAuthenticationSuccessHandler(successHandler);
@@ -40,7 +38,7 @@ public class LoginReqFilter extends AbstractAuthenticationProcessingFilter {
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res) throws AuthenticationException, IOException, ServletException {
-
+        log.info("LoginReqFilter");
         if(!HttpMethod.POST.name().equals(req.getMethod())) {
             throw new ComAuthException(ErrorCode.E003);
         }
@@ -51,6 +49,6 @@ public class LoginReqFilter extends AbstractAuthenticationProcessingFilter {
             throw new ComAuthException(ErrorCode.E005);
         }
 
-        return new UsernamePasswordAuthenticationToken(signInDTO.getId(),signInDTO.getPw());
+        return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(signInDTO.getId(),signInDTO.getPw()));
     }
 }
