@@ -9,6 +9,6 @@ import org.apache.ibatis.type.Alias;
 @Alias("UsageCode")
 public class UsageCode {
     private String usageCodeId;
-    private String val;
+    private String usage;
     private String useYn;
 }

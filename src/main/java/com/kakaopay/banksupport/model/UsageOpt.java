@@ -11,4 +11,7 @@ public class UsageOpt {
     private String usageCodeId;
     private String lbsId;
     private String useYn;
+
+    private LocalBankSupport localBankSupport;
+    private UsageCode usageCode;
 }

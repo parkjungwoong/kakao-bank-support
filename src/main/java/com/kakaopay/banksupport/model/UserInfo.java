@@ -20,4 +20,5 @@ public class UserInfo {
     private String updtId;
     private String updtDtm;
     private String useYn;
+    private String authTrdNo;
 }

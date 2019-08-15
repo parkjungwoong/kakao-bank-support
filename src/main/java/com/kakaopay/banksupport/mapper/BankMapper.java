@@ -1,11 +1,15 @@
 package com.kakaopay.banksupport.mapper;
 
+import com.kakaopay.banksupport.dto.req.LbsSearchDTO;
 import com.kakaopay.banksupport.model.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.jdbc.SQL;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 @Mapper
@@ -23,8 +27,6 @@ public interface BankMapper {
 
     List<LocalBankSupport> selectBankSupport(LocalBankSupport localBankSupport);
 
-    UserInfo selectUserById();
-
     void insertRegion(RegionMas build);
 
     //=== 용도 관련 ===
@@ -37,5 +39,16 @@ public interface BankMapper {
     //용도 옵션 저장
     void insertUsageOpt(UsageOpt usageOpt);
 
-    void insertLocalBankSupportDtl(LocalBankSupportDtl localBankSupportDtl);
+    @SelectProvider(type = BankMapper.class, method = "dynamicSearch")
+    List<LocalBankSupport> selectBankSupportDynamic(SQL sql);
+
+    public static String dynamicSearch(SQL sql) {
+        return sql.toString();
+    }
+
+    int updateLocalBankSupport(LocalBankSupport localBankSupport);
+
+    List<LocalBankSupport> selectBankSupportList(LbsSearchDTO dto);
+
+    List<Map> selectBankSupportMapList(LbsSearchDTO dto);
 }

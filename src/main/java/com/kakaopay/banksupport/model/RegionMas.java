@@ -9,6 +9,6 @@ import org.apache.ibatis.type.Alias;
 @Alias("RegionMas")
 public class RegionMas {
     private String regionId;
-    private String name;
+    private String regionNm;
     private String mapId;
 }

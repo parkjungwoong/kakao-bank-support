@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.ibatis.type.Alias;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -14,11 +17,17 @@ import org.apache.ibatis.type.Alias;
 public class LocalBankSupport {
     private String lbsId;
     private String regionId;
+    private String regionNm;
     private String target;
     private String usage;
-    private String supportLimit;
-    private String rate;
+    private long supportLimit;
+    private double rateMin;
+    private double rateAvg;
+    private double rateMax;
     private String institute;
     private String mgmt;
     private String reception;
+    private String instId;
+    private LocalDateTime instDtm;
+    private String updtId;
 }
