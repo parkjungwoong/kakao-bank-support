@@ -1,21 +1,21 @@
 package com.kakaopay.banksupport.common.exception;
 
-import com.kakaopay.banksupport.common.constant.ErrorCode;
+import com.kakaopay.banksupport.common.constant.ResCode;
 import lombok.Getter;
 
 public class ComException extends RuntimeException {
 
     @Getter
-    private ErrorCode errorCode;
+    private ResCode resCode;
 
-    public ComException(ErrorCode errorCode, Throwable e){
-        super(errorCode.getMessage(), e);
-        this.errorCode = errorCode;
+    public ComException(ResCode resCode, Throwable e){
+        super(resCode.getMessage(), e);
+        this.resCode = resCode;
     }
 
-    public ComException(ErrorCode errorCode){
-        super(errorCode.getMessage());
-        this.errorCode = errorCode;
+    public ComException(ResCode resCode){
+        super(resCode.getMessage());
+        this.resCode = resCode;
     }
 
 }
