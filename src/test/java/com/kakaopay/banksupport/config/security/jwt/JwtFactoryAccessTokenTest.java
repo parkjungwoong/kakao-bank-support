@@ -1,6 +1,6 @@
 package com.kakaopay.banksupport.config.security.jwt;
 
-import com.kakaopay.banksupport.common.constant.ErrorCode;
+import com.kakaopay.banksupport.common.constant.ResCode;
 import com.kakaopay.banksupport.common.exception.ComException;
 import com.kakaopay.banksupport.config.ComSettings;
 import com.kakaopay.banksupport.model.UserInfo;
@@ -14,8 +14,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.time.LocalDateTime;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -46,15 +44,15 @@ public class JwtFactoryAccessTokenTest {
         JwtToken accessToken = jwtFactory.getAccessToken(userInfo);
 
         /*--------------- then ---------------*/
-        assertThat(accessToken.getUserInfo(), notNullValue());
-        assertThat(accessToken.getUserInfo().getUserNo(), is(TEST_USER_NO));
+        assertThat(accessToken.getUserContext(), notNullValue());
+        assertThat(accessToken.getUserContext().getUserNo(), is(TEST_USER_NO));
         assertThat(accessToken.getToken(), notNullValue());
     }
 
     @Test
     public void 회원번호없이는_생성안됨() {
         expectedException.expect(ComException.class);
-        expectedException.expectMessage(ErrorCode.E005.getMessage());
+        expectedException.expectMessage(ResCode.E005.getMessage());
 
         /*--------------- given ---------------*/
         UserInfo userInfo = UserInfo.builder().userNo("").build();
