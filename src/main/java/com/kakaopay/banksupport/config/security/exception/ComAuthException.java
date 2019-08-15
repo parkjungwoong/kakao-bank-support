@@ -1,21 +1,21 @@
 package com.kakaopay.banksupport.config.security.exception;
 
-import com.kakaopay.banksupport.common.constant.ErrorCode;
+import com.kakaopay.banksupport.common.constant.ResCode;
 import lombok.Getter;
 import org.springframework.security.core.AuthenticationException;
 
 public class ComAuthException extends AuthenticationException {
 
     @Getter
-    private ErrorCode errorCode;
+    private ResCode resCode;
 
-    public ComAuthException(ErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.errorCode = errorCode;
+    public ComAuthException(ResCode resCode) {
+        super(resCode.getMessage());
+        this.resCode = resCode;
     }
 
-    public ComAuthException(ErrorCode errorCode, Throwable t) {
-        super(errorCode.getMessage(), t);
-        this.errorCode = errorCode;
+    public ComAuthException(ResCode resCode, Throwable t) {
+        super(resCode.getMessage(), t);
+        this.resCode = resCode;
     }
 }

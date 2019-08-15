@@ -1,8 +1,9 @@
 package com.kakaopay.banksupport.config.security.jwt;
 
-import com.kakaopay.banksupport.common.constant.ErrorCode;
+import com.kakaopay.banksupport.common.constant.ResCode;
 import com.kakaopay.banksupport.common.exception.ComException;
 import com.kakaopay.banksupport.config.ComSettings;
+import com.kakaopay.banksupport.config.security.dto.UserContext;
 import com.kakaopay.banksupport.model.UserInfo;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -35,7 +36,7 @@ public class JwtFactory {
     public JwtToken getAccessToken(UserInfo userInfo) throws ComException {
         if(StringUtils.isEmpty(userInfo.getUserNo())) {
             log.error("토크 생성시 회원 번호값은 필수");
-            throw new ComException(ErrorCode.E005);
+            throw new ComException(ResCode.E005);
         }
 
         try {
@@ -51,10 +52,10 @@ public class JwtFactory {
                     .signWith(SignatureAlgorithm.HS512, settings.getJwtSigningKey())
                     .compact();
 
-            return new JwtToken(token, userInfo);
+            return new JwtToken(token, UserContext.create(userInfo.getUserNo(),null));
         } catch (Exception e) {
             log.error("엑세스 토큰 생성 에러",e);
-            throw new ComException(ErrorCode.E006);
+            throw new ComException(ResCode.E006);
         }
     }
 
@@ -67,12 +68,12 @@ public class JwtFactory {
     public JwtToken getRefreshToken(UserInfo userInfo) throws ComException {
         if(StringUtils.isEmpty(userInfo.getUserNo())) {
             log.error("토크 생성시 회원 번호값은 필수");
-            throw new ComException(ErrorCode.E005);
+            throw new ComException(ResCode.E005);
         }
 
         try {
             Claims claims = Jwts.claims().setSubject(userInfo.getUserNo());
-            //todo : 상수 값으로 변경
+            //임시
             claims.put("RULE","REFRESH");
 
             LocalDateTime curDT = LocalDateTime.now();
@@ -85,10 +86,10 @@ public class JwtFactory {
                     .signWith(SignatureAlgorithm.HS512, settings.getJwtSigningKey())
                     .compact();
 
-            return new JwtToken(token, userInfo);
+            return new JwtToken(token, UserContext.create(userInfo.getUserNo(),null));
         } catch (Exception e) {
             log.error("리프레시 토큰 생성 에러",e);
-            throw new ComException(ErrorCode.E006);
+            throw new ComException(ResCode.E006);
         }
     }
 

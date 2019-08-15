@@ -1,6 +1,6 @@
 package com.kakaopay.banksupport.config.security.jwt;
 
-import com.kakaopay.banksupport.common.constant.ErrorCode;
+import com.kakaopay.banksupport.common.constant.ResCode;
 import com.kakaopay.banksupport.config.security.exception.ComAuthException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -15,10 +15,10 @@ public class JwtParser {
         try {
             return Jwts.parser().setSigningKey(signingKey).parseClaimsJws(rowToken);
         } catch (ExpiredJwtException exp) {
-            throw new ComAuthException(ErrorCode.E008);
+            throw new ComAuthException(ResCode.E008);
         } catch (Exception e) {
             log.error("토큰 파싱 에러",e);
-            throw new ComAuthException(ErrorCode.E007);
+            throw new ComAuthException(ResCode.E007);
         }
     }
 }

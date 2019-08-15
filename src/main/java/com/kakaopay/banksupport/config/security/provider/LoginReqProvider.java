@@ -1,8 +1,9 @@
 package com.kakaopay.banksupport.config.security.provider;
 
-import com.kakaopay.banksupport.common.constant.ErrorCode;
+import com.kakaopay.banksupport.common.constant.ResCode;
+import com.kakaopay.banksupport.config.security.Sha256PasswordEncoder;
 import com.kakaopay.banksupport.config.security.exception.ComAuthException;
-import com.kakaopay.banksupport.dto.SignInDTO;
+import com.kakaopay.banksupport.dto.req.SignInDTO;
 import com.kakaopay.banksupport.model.UserInfo;
 import com.kakaopay.banksupport.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -24,10 +24,10 @@ import java.util.List;
 public class LoginReqProvider implements AuthenticationProvider {
 
     private UserService userService;
-    private BCryptPasswordEncoder passwordEncoder;
+    private Sha256PasswordEncoder passwordEncoder;
 
     @Autowired
-    public LoginReqProvider(UserService userService, BCryptPasswordEncoder passwordEncoder) {
+    public LoginReqProvider(UserService userService, Sha256PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
     }
@@ -40,8 +40,8 @@ public class LoginReqProvider implements AuthenticationProvider {
 
         UserInfo userInfo = userService.selectUserInfo(SignInDTO.builder().id(id).pw(pw).build());
 
-        if(userInfo == null) throw new ComAuthException(ErrorCode.E004);
-        if(!passwordEncoder.matches(pw, userInfo.getUserPw()))  throw new ComAuthException(ErrorCode.E004);
+        if(userInfo == null) throw new ComAuthException(ResCode.E004);
+        if(!passwordEncoder.matches(pw, userInfo.getUserPw()))  throw new ComAuthException(ResCode.E004);
 
         //todo: 권한 설정하기
         List<GrantedAuthority> authorityList = new ArrayList<>();

@@ -1,6 +1,6 @@
 package com.kakaopay.banksupport.config.security.jwt;
 
-import com.kakaopay.banksupport.model.UserInfo;
+import com.kakaopay.banksupport.config.security.dto.UserContext;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -8,5 +8,5 @@ import lombok.Data;
 @Data
 public class JwtToken {
     String token;
-    UserInfo userInfo;
+    UserContext userContext;
 }
