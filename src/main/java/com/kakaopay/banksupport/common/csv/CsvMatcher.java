@@ -1,6 +1,6 @@
 package com.kakaopay.banksupport.common.csv;
 
-import com.kakaopay.banksupport.common.constant.ErrorCode;
+import com.kakaopay.banksupport.common.constant.ResCode;
 import com.kakaopay.banksupport.common.exception.ComException;
 import com.kakaopay.banksupport.dto.CsvDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +14,7 @@ import java.util.List;
  * @param <T> 변환할 데이터 타입
  */
 @Slf4j
-public abstract class CsvMatcher<T> {
+public abstract class CsvMatcher<T extends CsvMatcherDTO> {
 
     private Class<T> clazzOfT;
 
@@ -38,20 +38,24 @@ public abstract class CsvMatcher<T> {
      */
     public List<T> getConverData(CsvDTO csvDTO) throws ComException {
         //todo: null 및 데이터 길이 검사
+        if(csvDTO == null) {
+            log.error("CsvDTO is null");
+            throw new ComException(ResCode.E001);
+        }
 
         boolean match = isMatch(csvDTO.getRowData(0));
-        if(!match) throw new ComException(ErrorCode.E001);
+        if(!match) throw new ComException(ResCode.E001);
 
         List<T> result = new ArrayList<>(csvDTO.getRow().size());
 
         for(int i=1; csvDTO.getRow().size()>i; i++) {
-            result.add(getConvertData(csvDTO.getRowData(i)));
+            result.add(setRowToDTO(csvDTO.getRowData(i)));
         }
 
         return result;
     }
 
-    private T getConvertData(List<String> rowData) {
+    private T setRowToDTO(List<String> rowData) {
         //todo: 변수명 및 에러 처리 수정하기
         T t;
 
@@ -59,7 +63,7 @@ public abstract class CsvMatcher<T> {
             t = clazzOfT.newInstance();
         } catch (Exception e) {
             log.error("getConvertData ERR",e);
-            throw new ComException(ErrorCode.E999);
+            throw new ComException(ResCode.E999);
         }
 
         Class<?> c = t.getClass();
@@ -76,7 +80,7 @@ public abstract class CsvMatcher<T> {
             }
         } catch (Exception e) {
             log.error("getConvertData ERR",e);
-            throw new ComException(ErrorCode.E999);
+            throw new ComException(ResCode.E999);
         }
 
         return t;
