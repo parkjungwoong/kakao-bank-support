@@ -3,11 +3,54 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.kakaopay.banksupport.mapper.BankMapper">
+<mapper namespace="com.kakaopay.banksupport.mapper.UserMapper">
 
-    <select id="selectUserById" resultType="UserInfo">
+    <select id="selectUserById" resultType="UserInfo" parameterType="string">
         SELECT *
-        FROM USER_INFO
+        FROM   USER_INFO
+        WHERE  USER_ID = #{userId}
+    </select>
+
+    <insert id="insertUserInfo" parameterType="UserInfo">
+        INSERT INTO USER_INFO
+        (
+          USER_NO,
+          USER_ID,
+          USER_PW,
+          INST_ID,
+          INST_DTM,
+          USE_YN
+        )
+        VALUES
+        (
+          TO_CHAR(SYSDATE,'YYYYMMDD')||SEQ_USER_NO.NEXTVAL,
+          #{userId},
+          #{userPw},
+          #{userId},
+          SYSDATE,
+          'Y'
+        )
+    </insert>
+
+    <insert id="insertAuthTrd" parameterType="AuthTrd">
+        INSERT INTO AUTH_TRD
+        (
+            AUTH_TRD_NO,
+            USER_NO,
+            INST_DTM
+        )
+        VALUES
+        (
+            TO_CHAR(SYSDATE,'YYYYMMDD')||SEQ_AUTH_TRD_NO.NEXTVAL,
+            #{userNo},
+            SYSDATE
+        )
+    </insert>
+
+    <select id="selectAuthTrd" resultType="AuthTrd" parameterType="AuthTrd">
+        SELECT *
+        FROM   AUTH_TRD
+        WHERE  USER_NO = #{userNo}
     </select>
 
 </mapper>

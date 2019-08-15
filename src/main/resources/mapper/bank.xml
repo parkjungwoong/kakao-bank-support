@@ -5,15 +5,17 @@
 
 <mapper namespace="com.kakaopay.banksupport.mapper.BankMapper">
 
+    <!-- 지원 정보 원장 -->
     <insert id="insertBankSupport" parameterType="LocalBankSupport">
         INSERT INTO LOCAL_BANK_SUPPORT
         (
             LBS_ID,
             REGION_ID,
             TARGET,
-            USAGE,
             SUPPORT_LIMIT,
-            RATE,
+            RATE_MIN,
+            RATE_AVG,
+            RATE_MAX,
             INSTITUTE,
             MGMT,
             RECEPTION
@@ -23,9 +25,10 @@
             #{lbsId},
             #{regionId},
             #{target},
-            #{usage},
             #{supportLimit},
-            #{rate},
+            #{rateMin},
+            #{rateAvg},
+            #{rateMax},
             #{institute},
             #{mgmt},
             #{reception}
@@ -37,17 +40,18 @@
         FROM   LOCAL_BANK_SUPPORT
     </select>
 
+    <!-- 지자체 원장 저장 -->
     <insert id="insertRegion" parameterType="RegionMas">
         INSERT INTO REGION_MAS
         (
             REGION_ID,
-            NAME,
+            REGION_NM,
             MAP_ID
         )
         VALUES
         (
             #{regionId},
-            #{name},
+            #{regionNm},
             #{mapId}
         )
     </insert>
@@ -57,13 +61,13 @@
         INSERT INTO USAGE_CODE
         (
             USAGE_CODE_ID,
-            VAL,
+            USAGE,
             USE_YN
         )
         VALUES
         (
             #{usageCodeId},
-            #{val},
+            #{usage},
             #{useYn}
         )
     </insert>
@@ -84,26 +88,73 @@
         )
     </insert>
 
-    <!-- 지원 정보 상세 저장 -->
-    <insert id="insertLocalBankSupportDtl" parameterType="LocalBankSupportDtl">
-        INSERT INTO LOCAL_BANK_SUPPORT_DTL
+    <!-- 지원 정보 원장 업데이트 -->
+    <update id="updateLocalBankSupport" parameterType="LocalBankSupport">
+        UPDATE  LOCAL_BANK_SUPPORT
+        SET     UPDT_ID = #{updtId}
+                ,UPDT_DTM = SYSDATE
+                <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(target)">,TARGET = #{target}</if>
+                <if test="supportLimit != 0">,SUPPORT_LIMIT = #{supportLimit}</if>
+                <if test="rateMin != 0">,RATE_MIN = #{rateMin}</if>
+                <if test="rateAvg != 0">,RATE_AVG = #{rateAvg}</if>
+                <if test="rateAvg != 0">,RATE_MAX = #{rateMax}</if>
+                <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(institute)">,INSTITUTE = #{institute}</if>
+                <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(mgmt)">,MGMT = #{mgmt}</if>
+                <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(reception)">,RECEPTION = #{reception}</if>
+        WHERE   LBS_ID = #{lbsId}
+    </update>
+
+
+    <select id="selectBankSupportList" parameterType="LbsSearchDTO" resultType="LocalBankSupport">
+        SELECT    T1.*, T2.REGION_NM, GROUP_CONCAT(T4.USAGE SEPARATOR ' 및 ') AS USAGE
+        FROM      LOCAL_BANK_SUPPORT T1,
+                  REGION_MAS T2,
+                  USAGE_OPT T3,
+                  USAGE_CODE T4
+        WHERE     T1.REGION_ID = T2.REGION_ID
+        AND       T1.LBS_ID = T3.LBS_ID
+        AND       T3.USAGE_CODE_ID = T4.USAGE_CODE_ID
+        <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(match)">
+            AND ${match}
+        </if>
+        GROUP BY  T1.LBS_ID
+        <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(sort)">
+            ORDER BY ${sort}
+        </if>
+        <if test="limit > 0">LIMIT #{limit}</if>
+    </select>
+
+    <select id="selectBankSupportMapList" parameterType="LbsSearchDTO" resultType="map">
+        SELECT  <if test="fields != null">
+                    <foreach item="item" collection="fields" separator=",">
+                        ${item}
+                    </foreach>
+                </if>
+                <if test="fields == null">
+                    *
+                </if>
+        FROM
         (
-            LBS_DTL_ID,
-            LBS_ID,
-            SUPPORT_LIMIT,
-            RATE_MIN,
-            RATE_AVG,
-            RATE_MAX
+            SELECT    T1.LBS_ID, T1.REGION_ID, T1.TARGET, T1.RATE_MIN, T1.RATE_AVG, T1.RATE_MAX, T1.INSTITUTE, T1.MGMT, T1.RECEPTION, T1.SUPPORT_LIMIT,
+                      <!-- DECODE(SUPPORT_LIMIT, -1, '${@com.kakaopay.banksupport.common.constant.CsvGubunStr@SUPPORT_LIMIT.str}',SUPPORT_LIMIT) AS SUPPORT_LIMIT, -->
+                      T2.REGION_NM,
+                      GROUP_CONCAT(T4.USAGE SEPARATOR ' ${@com.kakaopay.banksupport.common.constant.CsvGubunStr@USAGE_SPLIT.str} ') AS USAGE
+            FROM      LOCAL_BANK_SUPPORT T1,
+                      REGION_MAS T2,
+                      USAGE_OPT T3,
+                      USAGE_CODE T4
+            WHERE     T1.REGION_ID = T2.REGION_ID
+            AND       T1.LBS_ID = T3.LBS_ID
+            AND       T3.USAGE_CODE_ID = T4.USAGE_CODE_ID
+            <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(match)">
+                AND ${match}
+            </if>
+            GROUP BY  T1.LBS_ID
+            <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(sort)">
+                ORDER BY ${sort}
+            </if>
+            <if test="limit > 0">LIMIT #{limit}</if>
         )
-        VALUES
-        (
-            TO_CHAR(SYSDATE,'YYYYMMDD')||SEQ_LBS_DTL_ID.NEXTVAL,
-            #{lbsId},
-            #{supportLimit},
-            #{rateMin},
-            #{rateAvg},
-            #{rateMax}
-        )
-    </insert>
+    </select>
 
 </mapper>
