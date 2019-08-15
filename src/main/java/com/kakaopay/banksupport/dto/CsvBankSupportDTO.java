@@ -1,9 +1,10 @@
 package com.kakaopay.banksupport.dto;
 
+import com.kakaopay.banksupport.common.csv.CsvMatcherDTO;
 import lombok.Data;
 
 @Data
-public class CsvBankSupportDTO {
+public class CsvBankSupportDTO implements CsvMatcherDTO {
     private String gubun;
     private String regionNm;
     private String target;

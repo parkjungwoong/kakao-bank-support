@@ -1,9 +1,9 @@
-package com.kakaopay.banksupport.dto;
+package com.kakaopay.banksupport.dto.req;
 
 import lombok.Data;
 
 @Data
-public class LocalBankSupportDTO {
+public class LbsUpdateDTO {
     private String lbsId;
     private String regionId;
     private String target;

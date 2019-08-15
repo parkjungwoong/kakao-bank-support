@@ -1,4 +1,4 @@
-package com.kakaopay.banksupport.dto;
+package com.kakaopay.banksupport.dto.req;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
