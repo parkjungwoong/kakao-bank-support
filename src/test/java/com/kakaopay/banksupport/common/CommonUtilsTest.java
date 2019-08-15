@@ -1,68 +1,102 @@
 package com.kakaopay.banksupport.common;
 
-import com.kakaopay.banksupport.model.LocalBankSupport;
+import com.kakaopay.banksupport.common.constant.ResCode;
+import com.kakaopay.banksupport.common.exception.ComException;
+import com.kakaopay.banksupport.dto.CsvDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.*;
 
 @Slf4j
 public class CommonUtilsTest {
 
-    @Test
-    public void readCsvFile() {
-        /*List<List<String>> lists = CommonUtils.readCsvFile("/Users/jungwoongpark/Documents/workspace/bank-support/src/main/resources/data/서버개발_사전과제1_지자체협약지원정보_16년12월현재__최종.csv");
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
-        for(List<String> row : lists) {
-            log.info("==============================");
-            for(int i=0; row.size()>i; i++) {
-                log.info("{}",row.get(i));
-            }
-            //sqlSession.insert();
-        }*/
+    private final String TEST_CSV_FILE_PATH = "src/test/testData.csv";
+    private final int TEST_CSV_ROW_CNT = 6;
+
+    @Test
+    public void CSV파일읽기() {
+        /*--------------- given ---------------*/
+        //TEST_CSV_FILE_PATH 파일 경로
+
+        /*--------------- when ---------------*/
+        CsvDTO csvDTO = CommonUtils.readCsvFile(TEST_CSV_FILE_PATH);
+
+        /*--------------- then ---------------*/
+        assertThat(csvDTO, notNullValue());
+        assertThat(csvDTO.getRow().size(), is(TEST_CSV_ROW_CNT));
     }
 
     @Test
-    public void name() throws Exception {
-        Field[] declaredFields = LocalBankSupport.class.getDeclaredFields();
+    public void CSV파일읽기_파일없을때() {
+        expectedException.expect(ComException.class);
+        expectedException.expectMessage(ResCode.E999.getMessage());
 
-        LocalBankSupport ob = new LocalBankSupport();
+        /*--------------- given ---------------*/
+        final String fileNotfound = "";
 
-        Field lbsId = ob.getClass().getDeclaredField("lbsId");
-        lbsId.setAccessible(true);
-        lbsId.set(lbsId,"asdf");
+        /*--------------- when ---------------*/
+        CommonUtils.readCsvFile(fileNotfound);
 
-        log.info("lbsid => {}",ob.getLbsId());
-
-        for(Field e : declaredFields) {
-            log.info(e.getName());
-        }
+        /*--------------- then ---------------*/
+        //Exception E999
     }
 
     @Test
-    public void name2() throws Exception {
+    public void 쉼표로_구분된_문자열_파싱() {
+        /*--------------- given ---------------*/
+        final String row = "가,a,1,$,\"따옴표, 포함된내용\"";
 
-        //todo: 매핑 해주는게 필요해, enum으로 가져와서
-        LocalBankSupport book = new LocalBankSupport();
-        Class<?> c = book.getClass();
+        /*--------------- when ---------------*/
+        List<String> splitedRow = CommonUtils.parsingCsvRow(row);
 
-        Field[] fields = c.getDeclaredFields();
-
-        int i = 0;
-
-        for(Field f : fields) {
-            f.setAccessible(true);
-            f.set(book,"fak"+i);
-            i++;
-        }
-
-        /*Field chap = c.getDeclaredField("lbsId");
-        chap.setAccessible(true);
-        chap.set(book, "1234");*/
-
-        log.info("id = > {}",book.getLbsId());
+        /*--------------- then ---------------*/
+        assertThat(splitedRow.get(0), is("가"));
+        assertThat(splitedRow.get(1), is("a"));
+        assertThat(splitedRow.get(2), is("1"));
+        assertThat(splitedRow.get(3), is("$"));
+        assertThat(splitedRow.get(4), is("따옴표, 포함된내용"));
     }
+
+    @Test
+    public void 쉼표로_구분된_문자열_파싱_null값처리() {
+        /*--------------- given ---------------*/
+        final String row = null;
+
+        /*--------------- when ---------------*/
+        List<String> splitedRow = CommonUtils.parsingCsvRow(row);
+
+        /*--------------- then ---------------*/
+        assertThat(splitedRow, notNullValue());
+        assertThat(splitedRow.size(), is(0));
+    }
+
+    @Test
+    public void 쉼표로_구분된_문자열_파싱_공백값처리() {
+        /*--------------- given ---------------*/
+        final String rowEmpty = "";
+        final String rowSpace = "  ";
+
+        /*--------------- when ---------------*/
+        List<String> splitedRowEmpty = CommonUtils.parsingCsvRow(rowEmpty);
+        List<String> splitedRowSpace = CommonUtils.parsingCsvRow(rowSpace);
+
+        /*--------------- then ---------------*/
+        assertThat(splitedRowEmpty, notNullValue());
+        assertThat(splitedRowEmpty.size(), is(0));
+
+        assertThat(splitedRowSpace, notNullValue());
+        assertThat(splitedRowSpace.size(), is(0));
+    }
+
+
 }
