@@ -12,13 +12,6 @@ public class TestSql {
         }}.toString();
     }
 
-    public static String 지원_정보_상세_전체() {
-        return new SQL(){{
-            SELECT("*");
-            FROM("LOCAL_BANK_SUPPORT_DTL");
-        }}.toString();
-    }
-
     public static String 용도_코드_전체() {
         return new SQL(){{
             SELECT("*");
@@ -54,5 +47,9 @@ public class TestSql {
             SELECT("*");
             FROM("USER_INFO");
         }}.toString();
+    }
+
+    public static String 쿼리_문자열로(String sql) {
+        return sql;
     }
 }
